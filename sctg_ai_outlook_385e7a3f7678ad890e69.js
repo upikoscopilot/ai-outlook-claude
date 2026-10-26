@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkai_outlook_claude=self.webpackChunkai_outlook_claude||[]).push([[76],{64076:function(a,u,l){l.d(u,{Co_:function(){return n}});const n=(0,l(59307).U)("Warning12Filled","12",["M5.21 1.46a.9.9 0 0 1 1.58 0l4.09 7.17a.92.92 0 0 1-.79 1.37H1.91a.92.92 0 0 1-.79-1.37l4.1-7.17ZM5.5 4.5v1a.5.5 0 0 0 1 0v-1a.5.5 0 0 0-1 0ZM6 6.75a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Z"])}}]);
+//# sourceMappingURL=sctg_ai_outlook_385e7a3f7678ad890e69.js.map

@@ -1,0 +1,35 @@
+/**
+ * =========================================================
+ * © 2024 Ronan LE MEILLAT for SCTG Development
+ * =========================================================
+ * @file HeroComboPrompts.tsx
+ * @description The HeroComboPrompts component for the AI pane.
+ * @author Ronan LE MEILLAT
+ * @copyright 2024 Ronan LE MEILLAT for SCTG Development
+ * @license AGPLv3
+ * This component is part of the AI pane module for the Outlook add-in.
+ */
+
+/**
+ * @file Aipane.tsx
+ * @description The main application component.
+ * @author Ronan LE MEILLAT
+ * @copyright 2024 Ronan LE MEILLAT for SCTG Development
+ * @license AGPLv3
+ */
+
+/**
+ * @file Settings.tsx
+ * @description The main application component.
+ * @author Ronan LE MEILLAT
+ * @copyright 2024 Ronan LE MEILLAT for SCTG Development
+ * @license AGPLv3
+ */
+
+/**
+ * @file TextInsertion.tsx
+ * @description The main application component.
+ * @author Ronan LE MEILLAT
+ * @copyright 2024 Ronan LE MEILLAT for SCTG Development
+ * @license AGPLv3
+ */
