@@ -1,0 +1,84 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types: [published]
+  schedule:
+    - cron: '0 0 * * 0' # every Sunday at midnight
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  packages: write
+  attestations: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: |
+          GROQ_API_KEY=${{ secrets.GROQ_API_KEY }} npm run getGroqModels
+          npm run build
+          # cp dist/aipane.html dist/index.html
+
+      - name: Zip dist folder
+        run: |
+            cd dist
+            zip -r ../release.zip .
+            cd ..
+
+      - name: Create Release with gh
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+            export TAG_NAME=${{ github.event.release.tag_name }}
+            export TAG_NAME=${TAG_NAME:-"nightly"}
+            echo $TAG_NAME
+            mv release.zip release_${TAG_NAME}.zip
+            cp dist/manifest.json manifest_${TAG_NAME}.json
+            cp dist/manifest.xml manifest_${TAG_NAME}.xml
+            gh release create $TAG_NAME -t "$TAG_NAME" -n "$TAG_NAME" || true
+            gh release upload $TAG_NAME release_${TAG_NAME}.zip --clobber
+            gh release upload $TAG_NAME manifest_${TAG_NAME}.json --clobber
+            gh release upload $TAG_NAME manifest_${TAG_NAME}.xml --clobber
+      
+      - name: Build project for GitHub Pages
+        run: |
+          GROQ_API_KEY=${{ secrets.GROQ_API_KEY }} npm run getGroqModels
+          npm run build:github-pages
+          # cp dist/aipane.html dist/index.html
+
+      - name: Zip dist folder
+        run: |
+            cd dist
+            zip -r ../release-github-pages.zip .
+            cd ..
+
+      - name: Create Release with gh
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+            export TAG_NAME=${{ github.event.release.tag_name }}
+            export TAG_NAME=${TAG_NAME:-"nightly"}
+            echo $TAG_NAME
+            mv release-github-pages.zip release_github_pages_${TAG_NAME}.zip
+            gh release create $TAG_NAME -t "$TAG_NAME" -n "$TAG_NAME" || true
+            gh release upload $TAG_NAME release_github_pages_${TAG_NAME}.zip --clobber
