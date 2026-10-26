@@ -4,8 +4,8 @@
     xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
     xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0"
     xsi:type="MailApp">
-    <Id>3f6c2a8e-7b41-4d5a-9c1e-5a8b2d7e4f10</Id>
-    <Version>1.1.0</Version>
+    <Id>fb8b63d2-afd3-444d-a4d4-934846054b28</Id>
+    <Version>1.2.0</Version>
     <ProviderName>Ronan LE MEILLAT</ProviderName>
     <DefaultLocale>en-US</DefaultLocale>
     <DisplayName DefaultValue="Claude Mail" />

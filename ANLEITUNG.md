@@ -4,8 +4,9 @@ Claude-Assistent für Outlook: Text in einer neuen Mail markieren → Prompt wä
 
 ## Installation (empfohlen: GitHub Pages, kein Server nötig)
 1. https://aka.ms/olksideload öffnen und mit dem Microsoft-365-Konto anmelden.
-2. „Meine Add-Ins“ → „Benutzerdefiniertes Add-In hinzufügen“ → „Von URL hinzufügen…“
-   `https://upikoscopilot.github.io/ai-outlook-claude/manifest.xml`
+2. „Meine Add-Ins“ → „Benutzerdefiniertes Add-In hinzufügen“ → „Aus Datei hinzufügen…“ →
+   `pages\manifest.xml` (Kopie von https://upikoscopilot.github.io/ai-outlook-claude/manifest.xml).
+   Wichtig: nicht `dist\manifest.xml` – das zeigt auf localhost.
 3. Neue Mail aus dem Microsoft-Konto → Apps → „Claude Mail“ → API-Key von console.anthropic.com eintragen.
 
 Add-ins funktionieren nur bei Microsoft-Konten (Microsoft 365 / outlook.com), nicht bei Gmail-Konten im neuen Outlook.
