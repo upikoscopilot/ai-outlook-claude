@@ -10,7 +10,6 @@ import { config } from "./config";
 import type { AIAnswer, AIModel, AIPrompt, AIProvider } from "./AIPrompt.js";
 import DOMPurify from "dompurify";
 
-const ERROR_MESSAGE: string = "Error: Unable to insert AI answer.";
 const ANTHROPIC_VERSION: string = "2023-06-01";
 
 /**
@@ -49,8 +48,7 @@ async function aiRequest(
 
   const data = await response.json().catch(() => null);
   if (!response.ok) {
-    const message = data?.error?.message || response.statusText;
-    throw new Error(`Anthropic API ${response.status}: ${message}`);
+    throw new Error(explainApiError(response.status, data?.error?.message || response.statusText));
   }
 
   return (data?.content || [])
@@ -58,6 +56,24 @@ async function aiRequest(
     .map((block: { text: string }) => block.text)
     .join("")
     .trim();
+}
+
+/**
+ * Turns an Anthropic API error into a clear German message.
+ * @param {number} status - HTTP status code.
+ * @param {string} message - Error message from the API.
+ * @returns {string} - Message for the user.
+ */
+function explainApiError(status: number, message: string): string {
+  const raw = `(Anthropic ${status}: ${message})`;
+  if (status === 401) return `API-Key ungültig oder gelöscht – bitte neuen Key eintragen. ${raw}`;
+  if (status === 403) return `Der API-Key hat keine Berechtigung für diese Anfrage. ${raw}`;
+  if (/credit balance/i.test(message))
+    return `Kein API-Guthaben – bitte unter platform.claude.com → Billing aufladen. ${raw}`;
+  if (status === 404) return `Modell nicht verfügbar – bitte ein anderes Modell wählen. ${raw}`;
+  if (status === 429) return `Zu viele Anfragen oder Limit erreicht – bitte kurz warten. ${raw}`;
+  if (status === 529 || status >= 500) return `Anthropic ist gerade überlastet – bitte gleich nochmal versuchen. ${raw}`;
+  return `Anfrage fehlgeschlagen. ${raw}`;
 }
 
 /**
@@ -157,15 +173,22 @@ export async function insertAIAnswer(
   id: string,
   userText: string
 ): Promise<AIAnswer> {
-  const { system, user } = await getPrompt(id);
-
-  // Validate and sanitize inputs
-  if (!system || !user || !userText) {
-    console.error("insertAIAnswer: Invalid input");
-    throw new Error("insertAIAnswer: Invalid input");
+  // Every problem is returned as a message – a thrown error would leave the pane spinning forever
+  if (!apiKey) {
+    return { response: "", error: "Kein API-Key gespeichert." };
+  }
+  if (!model) {
+    return { response: "", error: "Bitte ein Modell wählen." };
+  }
+  if (!userText || !userText.trim()) {
+    return {
+      response: "",
+      error: "Kein Text: bitte Text in der Mail markieren oder unten eigenen Text eingeben.",
+    };
   }
 
   try {
+    const { system, user } = await getPrompt(id);
     console.log(`Prompt: ${id}`);
 
     // Make the AI request and get the response
@@ -179,7 +202,13 @@ export async function insertAIAnswer(
     return { response: aiText, error: null };
   } catch (err) {
     console.error("insertAIAnswer: " + err);
-    return { response: "", error: `${ERROR_MESSAGE} ${err instanceof Error ? err.message : err}` };
+    const message = err instanceof Error ? err.message : String(err);
+    return {
+      response: "",
+      error: /Failed to fetch|NetworkError/i.test(message)
+        ? "Keine Verbindung zu api.anthropic.com – Internet oder Firewall prüfen."
+        : message,
+    };
   }
 }
 

@@ -95,17 +95,15 @@ const TextInsertion: React.FC<TextInsertionProps> = (props: TextInsertionProps):
    */
   const requestAI = useCallback(
     async (querytext: string) => {
+      setAnswer(null);
       setSkeletonVisibility(true);
-      const answer = await props.getAIAnswer(querytext);
-      setSkeletonVisibility(false);
-      if (answer.error) {
-        let error =
-          !(await isOutlookClient()) && answer.error.includes("Unable to insert AI answer")
-            ? ""
-            : `${answer.error}  \nAnswer:  \n`;
-        setAnswer(`${error}${answer.response}`);
-      } else {
-        setAnswer(answer.response);
+      try {
+        const answer = await props.getAIAnswer(querytext);
+        setAnswer(answer.error ? `**Fehler:** ${answer.error}` : answer.response);
+      } catch (err) {
+        setAnswer(`**Fehler:** ${err instanceof Error ? err.message : String(err)}`);
+      } finally {
+        setSkeletonVisibility(false);
       }
     },
     [props]
@@ -131,7 +129,13 @@ const TextInsertion: React.FC<TextInsertionProps> = (props: TextInsertionProps):
    */
   const handleTextFromOutlook = async () => {
     if (await isOutlookClient()) {
-      const selectedText = await getSelectedText();
+      let selectedText = "";
+      try {
+        selectedText = await getSelectedText();
+      } catch (err) {
+        setAnswer(`**Fehler:** Markierter Text konnte nicht gelesen werden (${err?.message || err}).`);
+        return;
+      }
       await requestAI(selectedText);
     }
   };
@@ -178,7 +182,7 @@ const TextInsertion: React.FC<TextInsertionProps> = (props: TextInsertionProps):
             download="answer.md"
             className={styles.downloadLink}
           >
-            Download Raw Answer
+            Antwort herunterladen
           </a>
         ) : null}
       </div>
