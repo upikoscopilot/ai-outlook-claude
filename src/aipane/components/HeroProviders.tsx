@@ -3,6 +3,7 @@
 * © 2024 Ronan LE MEILLAT for SCTG Development
 =========================================================
 */
+import * as storage from "../storage";
 import * as React from "react";
 import { Dropdown, Label, makeStyles, Option, useId } from "@fluentui/react-components";
 import { useState, useEffect } from "react";
@@ -34,7 +35,7 @@ const HeroProviders: React.FC<HeroProvidersProps> = ({ onChange }) => {
   const [selectedValue, setSelectedValue] = useState<string>(getDefaultProvider().name);
   const [providers, setProviders] = useState<AIProvider[]>([]);
 
-  let storedProviderName = localStorage.getItem("provider");
+  let storedProviderName = storage.getItem("provider");
   if (storedProviderName === null) {
     storedProviderName = getDefaultProvider().name;
   }
@@ -47,7 +48,7 @@ const HeroProviders: React.FC<HeroProvidersProps> = ({ onChange }) => {
     (event: React.FormEvent<HTMLButtonElement>, option?: any) => {
       event.preventDefault();
       const newValue = option?.nextOption.value || getDefaultProvider().name;
-      localStorage.setItem("provider", newValue);
+      storage.setItem("provider", newValue);
       setSelectedValue(newValue);
       onChange(getProvider(newValue));
     },
@@ -61,7 +62,7 @@ const HeroProviders: React.FC<HeroProvidersProps> = ({ onChange }) => {
   return (
     <div className={styles.root}>
       <Label htmlFor={selectId} size="large">
-        Provider
+        Anbieter
       </Label>
       <Dropdown
         className={styles.combobox}

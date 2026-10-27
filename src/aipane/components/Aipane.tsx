@@ -6,6 +6,7 @@
  * @license AGPLv3
  */
 
+import * as storage from "../storage";
 import * as React from "react";
 import { useState, useEffect } from "react";
 import Header from "./Header";
@@ -91,6 +92,12 @@ const Aipane: React.FC<AipaneProps> = (props: AipaneProps): React.JSX.Element =>
   const [showApiKeyInput, setShowApiKeyInput] = useState(false);
 
   /**
+   * @state apiKeyError
+   * @description Validation message for the API key input.
+   */
+  const [apiKeyError, setApiKeyError] = useState<string | null>(null);
+
+  /**
    * @state isStandalone
    * @description Whether the client is NOT Outlook.
    */
@@ -100,7 +107,7 @@ const Aipane: React.FC<AipaneProps> = (props: AipaneProps): React.JSX.Element =>
    * @state pageTitle
    * @description The title of the page.
    */
-  const [pageTitle, setPageTitle] = useState("AI Emailer");
+  const [pageTitle, setPageTitle] = useState("Claude Mail");
 
   /**
    * @constant listItems
@@ -124,7 +131,7 @@ const Aipane: React.FC<AipaneProps> = (props: AipaneProps): React.JSX.Element =>
     /**
      * @description Retrieves the stored API key for the current provider.
      */
-    const storedApiKey = localStorage.getItem(provider.apiKey);
+    const storedApiKey = storage.getItem(provider.apiKey);
     if (!storedApiKey) {
       setShowApiKeyInput(true);
     } else {
@@ -142,6 +149,7 @@ const Aipane: React.FC<AipaneProps> = (props: AipaneProps): React.JSX.Element =>
    */
   const handleApiKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setApiKey(event.target.value);
+    setApiKeyError(null);
   };
 
   /**
@@ -158,10 +166,20 @@ const Aipane: React.FC<AipaneProps> = (props: AipaneProps): React.JSX.Element =>
    * @description Handles submission of the API key.
    */
   const handleApiKeySubmit = () => {
-    if (apiKey) {
-      localStorage.setItem(provider.apiKey, apiKey);
-      setShowApiKeyInput(false);
+    // Pasted keys often carry spaces or line breaks, which the API rejects
+    const cleanedKey = (apiKey || "").replace(/\s+/g, "");
+    if (!cleanedKey) {
+      setApiKeyError("Bitte einen API-Key eingeben.");
+      return;
     }
+    if (!cleanedKey.startsWith("sk-ant-")) {
+      setApiKeyError("Das sieht nicht nach einem Anthropic-API-Key aus (beginnt mit sk-ant-).");
+      return;
+    }
+    storage.setItem(provider.apiKey, cleanedKey);
+    setApiKey(cleanedKey);
+    setApiKeyError(null);
+    setShowApiKeyInput(false);
   };
 
   /**
@@ -179,7 +197,7 @@ const Aipane: React.FC<AipaneProps> = (props: AipaneProps): React.JSX.Element =>
    * @param {string} userText
    */
   const handlePromptSubmit = (userText: string): Promise<AIAnswer> => {
-    const apiKey = localStorage.getItem(provider.apiKey);
+    const apiKey = storage.getItem(provider.apiKey);
     return insertAIAnswer(provider, model, apiKey, prompt, `${userText}`);
   };
 
@@ -190,7 +208,7 @@ const Aipane: React.FC<AipaneProps> = (props: AipaneProps): React.JSX.Element =>
    */
   const handleProviderChange = (provider: AIProvider) => {
     setProvider(provider);
-    if (!localStorage.getItem(provider.apiKey)) {
+    if (!storage.getItem(provider.apiKey)) {
       setShowApiKeyInput(true);
     }
   };
@@ -204,8 +222,11 @@ const Aipane: React.FC<AipaneProps> = (props: AipaneProps): React.JSX.Element =>
     Object.keys(config.providers).map((key) => {
       const provider = config.providers[key] as AIProvider;
       console.log(`Clearing key for ${provider.apiKey}`);
-      localStorage.removeItem(provider.apiKey);
+      storage.removeItem(provider.apiKey);
     });
+    // Show the key input again right away (previously only after a reload)
+    setApiKey(null);
+    setShowApiKeyInput(true);
   };
 
   useEffect(() => {
@@ -215,7 +236,7 @@ const Aipane: React.FC<AipaneProps> = (props: AipaneProps): React.JSX.Element =>
       isOutlookClient().then((isOutlook) => {
         console.log(`Version: ${versionInfo.commit} Date: ${versionInfo.date} Runs on Outlook: ${isOutlook}`);
         setIsStandalone(!isOutlook);
-        setPageTitle(isOutlook ? "AI Emailer" : "AI Standalone");
+        setPageTitle(isOutlook ? "Claude Mail" : "Claude Mail (Browser)");
       });
     }
   }, []);
@@ -229,10 +250,13 @@ const Aipane: React.FC<AipaneProps> = (props: AipaneProps): React.JSX.Element =>
           onApiKeyChange={handleApiKeyChange}
           onApiKeySubmit={handleApiKeySubmit}
           provider={provider}
+          error={apiKeyError}
         />
       ) : (
         <>
-          {/* <HeroList message="Ask Llama" items={listItems} /> */}
+          <span className={styles.fakeLink} onClick={() => setShowApiKeyInput(true)}>
+            API-Key gespeichert (…{(apiKey || "").slice(-4)}) – ändern
+          </span>
           <HeroProviders onChange={handleProviderChange} />
           <HeroModels onChange={handleModelChange} provider={provider} />
           <HeroComboPrompts onChange={handlePromptChange} standalone={isStandalone} />
@@ -241,10 +265,10 @@ const Aipane: React.FC<AipaneProps> = (props: AipaneProps): React.JSX.Element =>
       )}
       {!isStandalone ? (
         <span className={styles.fakeLink} onClick={clearKeys}>
-          Clean the keys
+          API-Key löschen
         </span>
       ) : (
-        <Link to="settings">Settings</Link>
+        <Link to="settings">Einstellungen</Link>
       )}
     </div>
   );

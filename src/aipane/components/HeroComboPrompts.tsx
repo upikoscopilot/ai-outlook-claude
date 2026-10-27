@@ -90,7 +90,7 @@ const HeroComboPrompts: React.FC<HeroComboPromptsProps> = ({ onChange, standalon
   return (
     <div className={styles.root}>
       <Label htmlFor={inputId} size="large">
-        AI Prompt
+        Aufgabe
       </Label>
       <Dropdown
         className={styles.combobox}

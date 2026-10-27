@@ -6,6 +6,7 @@
  * @license AGPLv3
  */
 
+import * as storage from "../storage";
 import * as React from "react";
 import Header from "./Header";
 import { Button, Input, Label, makeStyles } from "@fluentui/react-components";
@@ -43,7 +44,7 @@ const saveKeys = (): void => {
     const provider = config.providers[key] as AIProvider;
     inputIds.push(`provider-${provider.name}`);
     const apiKey = document.getElementById(`provider-${provider.name}`) as HTMLInputElement;
-    localStorage.setItem(`${provider.apiKey}`, apiKey.value);
+    storage.setItem(`${provider.apiKey}`, apiKey.value);
   });
 };
 
@@ -58,7 +59,7 @@ const Settings: React.FC = (): React.JSX.Element => {
         {Object.keys(config.providers).map((key) => {
           const provider = config.providers[key] as AIProvider;
           inputIds.push(`provider-${provider.name}`);
-          const apiKey = localStorage.getItem(`${provider.apiKey}`);
+          const apiKey = storage.getItem(`${provider.apiKey}`);
           return (
             <div className={styles.stack} key={provider.name}>
               <Label htmlFor={`provider-${provider.name}`}>{provider.name}</Label>

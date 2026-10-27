@@ -3,6 +3,7 @@
 * © 2024 Ronan LE MEILLAT for SCTG Development
 =========================================================
 */
+import * as storage from "../storage";
 import * as React from "react";
 import { Dropdown, Label, makeStyles, Option, useId } from "@fluentui/react-components";
 import { useState, useEffect } from "react";
@@ -34,7 +35,7 @@ const HeroModels: React.FC<HeroModelsProps> = ({ onChange, provider }) => {
   const selectId = useId("select");
   const [selectedValue, setSelectedValue] = useState<string>(getDefaultModel(provider).id);
 
-  let storedModelId = localStorage.getItem("model");
+  let storedModelId = storage.getItem("model");
   if (storedModelId === null) {
     storedModelId = getDefaultModel(provider).id;
   }
@@ -46,7 +47,7 @@ const HeroModels: React.FC<HeroModelsProps> = ({ onChange, provider }) => {
     (event: React.FormEvent<HTMLButtonElement>, option?: any) => {
       event.preventDefault();
       const newValue = option?.nextOption.value || getDefaultModel(provider).id;
-      localStorage.setItem("model", newValue);
+      storage.setItem("model", newValue);
       setSelectedValue(newValue);
       onChange(newValue);
     },
@@ -60,7 +61,7 @@ const HeroModels: React.FC<HeroModelsProps> = ({ onChange, provider }) => {
   return (
     <div className={styles.root}>
       <Label htmlFor={selectId} size="large">
-        Model
+        Modell
       </Label>
       <Dropdown
         className={styles.combobox}

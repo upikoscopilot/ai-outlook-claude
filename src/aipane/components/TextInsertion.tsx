@@ -146,20 +146,20 @@ const TextInsertion: React.FC<TextInsertionProps> = (props: TextInsertionProps):
 
   return (
     <div className={styles.textPromptAndInsertion}>
-      <Field className={styles.textAreaField} size="large" label="Enter your message.">
+      <Field className={styles.textAreaField} size="large" label="Eigener Text (optional):">
         <Textarea className={styles.textAreaBox} resize="vertical" value={userText} onChange={handleTextChange} />
       </Field>
-      <Field className={styles.instructions}>Click to ask AI.</Field>
+      <Field className={styles.instructions}>Text in der Mail markieren, dann „Markierten Text verwenden“.</Field>
       <Button
         appearance="primary"
         size="large"
         onClick={handleTextFromOutlook}
         className={isOutlook ? styles.buttonInsert : styles.buttonInsertOff}
       >
-        Use selected text
+        Markierten Text verwenden
       </Button>
       <Button appearance="primary" size="large" onClick={handleTextInsertion}>
-        {isOutlook ? "Insert answer" : "Ask AI"}
+        {isOutlook ? "Eigenen Text senden" : "Claude fragen"}
       </Button>
       <div>
         <Skeleton aria-label="Loading Content" className={skeletonVisibility ? styles.skeleton : styles.skeletonOff}>

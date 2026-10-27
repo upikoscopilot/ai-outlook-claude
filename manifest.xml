@@ -5,7 +5,7 @@
     xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0"
     xsi:type="MailApp">
     <Id>fb8b63d2-afd3-444d-a4d4-934846054b28</Id>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <ProviderName>Ronan LE MEILLAT</ProviderName>
     <DefaultLocale>en-US</DefaultLocale>
     <DisplayName DefaultValue="Claude Mail" />
