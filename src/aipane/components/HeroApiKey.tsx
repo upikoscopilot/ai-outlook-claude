@@ -44,7 +44,7 @@ const HeroApiKey: React.FC<HeroApiKeyProps> = ({ apiKey, onApiKeyChange, onApiKe
         <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noreferrer">
           console.anthropic.com
         </a>
-        . Er wird nur hier in Outlook gespeichert.
+        . Er wird in deinem Outlook-Postfach gespeichert (Add-in-Einstellungen), nicht auf GitHub.
       </span>
       <Input
         className={styles.input}
